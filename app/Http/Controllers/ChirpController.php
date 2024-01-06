@@ -11,7 +11,8 @@ use Illuminate\Http\RedirectResponse;
 class ChirpController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource. *GET*. 
+     * EJ: al momento de cargar la página.
      */
     public function index(): View
     {
@@ -29,7 +30,8 @@ class ChirpController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage. *POST*. 
+     * Ej: al momento de enviar algún formulario.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -53,17 +55,29 @@ class ChirpController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Chirp $chirp)
-    {
-        //
+    public function edit(Chirp $chirp): View
+    {   
+        $this->authorize('update', $chirp);
+
+        return view('chirps.edit', [
+            'chirp' => $chirp,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Chirp $chirp)
+    public function update(Request $request, Chirp $chirp): RedirectResponse
     {
-        //
+        $this->authorize('update', $chirp);
+
+        $validated = $request->validate([
+            'message' => 'required|string|max:255',
+        ]);
+ 
+        $chirp->update($validated);
+ 
+        return redirect(route('chirps.index'));
     }
 
     /**
